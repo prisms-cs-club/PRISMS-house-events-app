@@ -2,6 +2,16 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import styles from "./styles";
 
+/**
+ * A component that represents a point bar of a house
+ * @param {{
+ *  name: string,
+ *  point: number,
+ *  height: number,
+ *  topPoint: number
+ * }} param parameters of the point bar
+ * @returns The component
+ */
 export default function PointBar({
   name,
   point,
@@ -9,7 +19,7 @@ export default function PointBar({
   height,
   url,
   navigation,
-  topHouse,
+  topPoint,
   size = "medium",
 }) {
   return (
@@ -21,7 +31,7 @@ export default function PointBar({
     >
       <View style={styles.contents}>
         <View style={styles.pointBarContents}>
-          {topHouse === name && (
+          {topPoint == point && (
             <Image
               source={require("../../../../assets/Leaderboard/crown.png")}
               style={styles.crown}

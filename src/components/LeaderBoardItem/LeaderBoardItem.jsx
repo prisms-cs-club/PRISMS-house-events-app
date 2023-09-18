@@ -9,48 +9,42 @@ import { getBarHeight } from "../../helpers/barHeight";
 
 export default function LeaderBoardItem({ navigation, size = "medium" }) {
   const [houses, setHouses] = useState([]);
-  const [topHouseName, setTopHouseName] = useState("Albemarle");
+  const [topPoint, setTopPoint] = useState(0);
   const [orderResult, setOrderResult] = useState();
   const fetchHouses = async () => {
     let houseArr = [];
     let sortedHouseArr = [];
-    const { house, error: aError } = await getHouseByName("Albemarle");
-    if (aError) return;
-    houseArr.push(house);
-    sortedHouseArr.push(house);
-    const { house: lHouse, error: lError } = await getHouseByName("Lambert");
-    if (aError) return;
-    houseArr.push(lHouse);
-    sortedHouseArr.push(lHouse);
-    const { house: hHouse, error: hError } = await getHouseByName("Hobler");
-    if (aError) return;
-    houseArr.push(hHouse);
-    sortedHouseArr.push(hHouse);
-    const { house: eHouse, error: eError } = await getHouseByName("Ettl");
-    if (aError) return;
-    houseArr.push(eHouse);
-    sortedHouseArr.push(eHouse);
-
+    for(const houseName in ["Albermarle", "Lambert", "Hobler", "Ettl"]) {
+      const { house, error: aError } = await getHouseByName(houseName);
+      if (aError) return;
+      houseArr.push(house);
+      sortedHouseArr.push(house);
+    }
     sortedHouseArr.sort((a, b) => b.point - a.point);
 
     const result = {};
-    sortedHouseArr.forEach((house, index) => {
-      result[house.name] = index + 1;
-    });
-
-    let maxHouse = houseArr[0].name;
-    let maxPoint = houseArr[0].point;
-
-    for (let i = 1; i < houseArr.length; i++) {
-      if (houseArr[i].point > maxPoint) {
-        maxPoint = houseArr[i].point;
-        maxHouse = houseArr[i].name;
+    // Go through the sorted array and determine the rank of each house
+    // If the house has the same point as the previous house, they have the same rank
+    // The total number of ranks is the number of distinct points among all houses
+    // For example, if the four houses' scores are [100, 200, 200, 300], the ranks are [3, 2, 2, 1]
+    for(let i = 0; i < sortedHouseArr.length; i++) {
+      const house = house[i];
+      if(i == 0) {
+        result[house.name] = 1;
+      } else {
+        const prevHouse = house[i - 1];
+        if(house.point == prevHouse.point) {
+          result[house.name] = result[prevHouse.name];
+        } else {
+          result[house.name] = result[prevHouse] + 1;
+        }
       }
     }
 
     setOrderResult(result);
     setHouses(houseArr);
-    setTopHouseName(maxHouse);
+    const maxScore = sortedHouseArr[0].point;
+    setTopPoint(maxScore);
   };
 
   useEffect(() => {
@@ -64,7 +58,7 @@ export default function LeaderBoardItem({ navigation, size = "medium" }) {
   return (
     <View style={styles.container}>
       {houses.map((house) => {
-        const barH = getBarHeight(orderResult[house.name]);
+        const barH = getBarHeight(orderResult[house.name]); // TODO: handle different number of distinct points
         return (
           <View style={styles.houseContainer} key={house.name}>
             <PointBar
@@ -74,7 +68,7 @@ export default function LeaderBoardItem({ navigation, size = "medium" }) {
               color={getHouseColor(house.name)}
               height={size === "small" ? barH * 0.6 : barH}
               url={house.crest.url}
-              topHouse={topHouseName}
+              topPoint={topPoint}
               navigation={navigation}
             />
           </View>
