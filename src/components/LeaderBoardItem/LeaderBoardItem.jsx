@@ -14,9 +14,9 @@ export default function LeaderBoardItem({ navigation, size = "medium" }) {
   const fetchHouses = async () => {
     let houseArr = [];
     let sortedHouseArr = [];
-    for(const houseName in ["Albermarle", "Lambert", "Hobler", "Ettl"]) {
-      const { house, error: aError } = await getHouseByName(houseName);
-      if (aError) return;
+    for (const houseName of ["Albemarle", "Lambert", "Hobler", "Ettl"]) {
+      const { house, error } = await getHouseByName(houseName);
+      if (error) return;
       houseArr.push(house);
       sortedHouseArr.push(house);
     }
@@ -27,24 +27,20 @@ export default function LeaderBoardItem({ navigation, size = "medium" }) {
     // If the house has the same point as the previous house, they have the same rank
     // The total number of ranks is the number of distinct points among all houses
     // For example, if the four houses' scores are [100, 200, 200, 300], the ranks are [3, 2, 2, 1]
-    for(let i = 0; i < sortedHouseArr.length; i++) {
-      const house = house[i];
-      if(i == 0) {
-        result[house.name] = 1;
+    result[sortedHouseArr[0].name] = 1;
+    for (let i = 1; i < sortedHouseArr.length; i++) {
+      const house = sortedHouseArr[i];
+      const prevHouse = sortedHouseArr[i - 1];
+      if (house.point === prevHouse.point) {
+        result[house.name] = result[prevHouse.name];
       } else {
-        const prevHouse = house[i - 1];
-        if(house.point == prevHouse.point) {
-          result[house.name] = result[prevHouse.name];
-        } else {
-          result[house.name] = result[prevHouse] + 1;
-        }
+        result[house.name] = result[prevHouse.name] + 1;
       }
     }
 
     setOrderResult(result);
     setHouses(houseArr);
-    const maxScore = sortedHouseArr[0].point;
-    setTopPoint(maxScore);
+    setTopPoint(sortedHouseArr[0].point);
   };
 
   useEffect(() => {

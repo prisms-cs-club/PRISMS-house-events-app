@@ -31,7 +31,7 @@ export default function PointBar({
     >
       <View style={styles.contents}>
         <View style={styles.pointBarContents}>
-          {topPoint == point && (
+          {topPoint === point && (
             <Image
               source={require("../../../../assets/Leaderboard/crown.png")}
               style={styles.crown}

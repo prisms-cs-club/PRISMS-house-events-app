@@ -11,8 +11,11 @@ const MIN_BAR_HEIGHT = 150;
  * @returns 
  */
 export function getBarHeight(place, totalPlaces = 4) {
-  if(totalPlaces == 1) {
-    return (MAX_BAR_HEIGHT + MIN_BAR_HEIGHT) / 2;
+  let res;
+  if (totalPlaces === 1) {
+    res = (MAX_BAR_HEIGHT + MIN_BAR_HEIGHT) / 2;
+  } else {
+    res = MAX_BAR_HEIGHT - (MAX_BAR_HEIGHT - MIN_BAR_HEIGHT) * (place - 1) / (totalPlaces - 1);
   }
-  return MIN_BAR_HEIGHT + (MAX_BAR_HEIGHT - MIN_BAR_HEIGHT) * (place - 1) / (totalPlaces - 1);
+  return verticalScale(res);
 }
